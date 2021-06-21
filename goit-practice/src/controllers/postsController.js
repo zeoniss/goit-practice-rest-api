@@ -1,88 +1,79 @@
-let posts = [
-  {id: '1', topic: 'test1', text: 'test text1'},
-  {id: '2', topic: 'test2', text: 'test text2'},
-  {id: '3', topic: 'test3', text: 'test text3'},
-];
+const contacts = require("../controllers/contacts.json")
+const ObjectId = requeire("mongodb").ObjectID
+//  в обработчик добавляем операцию find, которой доставали контакты и отдаем их клиенту
 
-const getPosts = (req, res) => {
-  res.json({posts, status: 'success'});
-};
+const getContacts = async (req, res) => {
+  const contacts = await req.db.Contacts.find({}).toArray()
+  res.json({ contacts })
+}
 
-const getPostById = (req, res) => {
-  const {id} = req.params;
-  const [post] = posts.filter((item) => item.id === id);
+const getPostById = async (req, res) => {
+  const { id } = req.params
+  const [contacts] = await req.db.Contacts.findOne({
+    _id: new ObjectId(id),
+  })
 
-  if (!post) {
+  if (!contact) {
     return res.status(400).json({
       status: `failure, no posts with id '${id}' found!`,
-    });
+    })
   }
 
-  res.json({post, status: 'success'});
-};
+  res.json({ contacts, status: "success" })
+}
 
 const addPost = (req, res) => {
-  const {
-    topic,
-    text,
-  } = req.body;
+  const { topic, text } = req.body
 
-  posts.push({
+  contacts.push({
     id: new Date().getTime().toString(),
     topic,
     text,
-  });
+  })
 
-  res.json({status: 'success'});
-};
+  res.json({ status: "success" })
+}
 
 const changePost = (req, res) => {
-  const {
-    topic,
-    text,
-  } = req.body;
+  const { topic, text } = req.body
 
-  posts.forEach((post) => {
+  contacts.forEach((post) => {
     if (post.id === req.params.id) {
-      post.topic = topic;
-      post.text = text;
+      post.topic = topic
+      post.text = text
     }
-  });
+  })
 
-  res.json({status: 'success'});
-};
+  res.json({ status: "success" })
+}
 
 const patchPost = (req, res) => {
-  const {
-    topic,
-    text,
-  } = req.body;
+  const { topic, text } = req.body
 
-  posts.forEach((post) => {
+  contacts.forEach((post) => {
     if (post.id === req.params.id) {
       if (topic) {
-        post.topic = topic;
+        post.topic = topic
       }
       if (text) {
-        post.text = text;
+        post.text = text
       }
     }
-  });
+  })
 
-  res.json({status: 'success'});
-};
+  res.json({ status: "success" })
+}
 
 const deletePost = (req, res) => {
-  posts = posts.filter((item) => item.id !== req.params.id);
-  res.json({status: 'success'});
-};
+  contacts = contacts.filter((item) => item.id !== req.params.id)
+  res.json({ status: "success" })
+}
 
 module.exports = {
-  getPosts,
+  getContacts,
   getPostById,
   addPost,
   changePost,
   patchPost,
   deletePost,
-};
-
+}

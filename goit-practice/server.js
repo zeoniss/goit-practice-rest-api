@@ -1,19 +1,29 @@
-const express = require('express');
-const morgan = require('morgan');
-require('dotenv').config();
+const express = require("express")
+const morgan = require("morgan")
+require("dotenv").config()
 
-const app = express();
+const app = express()
 
-const {postsRouter} = require('./src/routers/postsRouter');
+const { connectMongo } = require("./src/db/connection")
 
-const PORT = process.env.PORT || 8081;
+const { contactsRouter } = require("./src/routers/contactsRouter")
 
-app.use(express.json());
-app.use(morgan('tiny'));
+const PORT = process.env.PORT || 8081
 
-app.use('/api/posts', postsRouter);
+app.use(express.json())
+app.use(morgan("tiny"))
 
-app.listen(PORT, (err) => {
-  if (err) console.error('Error at aserver launch:', err);
-  console.log(`Server works at port ${PORT}!`);
-});
+app.use("/api/contacts", contactsRouter)
+
+const start = async () => {
+  await connectMongo()
+  // const contacts = await Contacts.find({}).toArray()
+  // console.log(contacts)
+
+  app.listen(PORT, (err) => {
+    if (err) console.error("Error at aserver launch:", err)
+    console.log(`Server works at port ${PORT}!`)
+  })
+}
+
+start()
